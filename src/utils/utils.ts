@@ -1,3 +1,10 @@
+import {
+    ElementChild,
+    ElementProps,
+    SelectorElement,
+    SelectorCollection,
+} from '@/types/html';
+
 export function pascalToKebab(value: string): string {
     return value.replace(/([a-z0–9])([A-Z])/g, "$1-$2").toLowerCase();
 }
@@ -10,7 +17,10 @@ export function isEmpty(value: any): boolean {
     return value === null || value === undefined;
 }
 
-export type SelectorCollection<T> = string | NodeListOf<Element> | T[];
+// Для использования элемента или массива элементов в element.replaceChildren
+export function isChildElement(x: unknown): x is ElementChild {
+    return x instanceof HTMLElement || Array.isArray(x);
+}
 
 export function ensureAllElements<T extends HTMLElement>(selectorElement: SelectorCollection<T>, context: HTMLElement = document as unknown as HTMLElement): T[] {
     if (isSelector(selectorElement)) {
@@ -24,8 +34,6 @@ export function ensureAllElements<T extends HTMLElement>(selectorElement: Select
     }
     throw new Error(`Unknown selector element`);
 }
-
-export type SelectorElement<T> = T | string;
 
 export function ensureElement<T extends HTMLElement>(selectorElement: SelectorElement<T>, context?: HTMLElement): T {
     if (isSelector(selectorElement)) {
@@ -67,6 +75,31 @@ export function getObjectProperties(obj: object, filter?: (name: string, prop: P
     )
         .filter(([name, prop]: [string, PropertyDescriptor]) => filter ? filter(name, prop) : (name !== 'constructor'))
         .map(([name, prop]) => name);
+}
+
+/**
+ * Устанавливает дочерние элементы
+ */
+export function setElementChildren(root: HTMLElement, children: ElementChild) {
+    root.replaceChildren(...(Array.isArray(children) ? children : [children]));
+}
+
+/**
+ * Устанавливает свойства элемента
+ */
+export function setElementProps<T extends HTMLElement>(
+  element: HTMLElement,
+  props: ElementProps<T>
+) {
+    for (const key in props) {
+        const value = props[key];
+        if (isPlainObject(value) && key === 'dataset') {
+            setElementData(element, value);
+        } else {
+            // @ts-expect-error fix indexing later
+            element[key] = isBoolean(value) ? value : String(value);
+        }
+    }
 }
 
 /**
