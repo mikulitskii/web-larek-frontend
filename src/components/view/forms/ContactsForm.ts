@@ -11,11 +11,11 @@ export class ContactsFormView extends View<
 	init() {
 		this.element.addEventListener('submit', this.onSubmitHandler.bind(this));
 		this.ensure(this.settings.email).addEventListener(
-			'change',
+			'input',
 			this.onChangeHandler.bind(this)
 		);
 		this.ensure(this.settings.phone).addEventListener(
-			'change',
+			'input',
 			this.onChangeHandler.bind(this)
 		);
 	}
@@ -31,6 +31,7 @@ export class ContactsFormView extends View<
 			event,
 			value: { [input.name]: input.value },
 		});
+		input.focus();
 	}
 
 	set email(value: string) {

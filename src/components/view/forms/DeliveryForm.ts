@@ -22,7 +22,7 @@ export class DeliveryFormView extends View<
 		});
 		this.element.addEventListener('submit', this.onSubmitHandler.bind(this));
 		this.ensure(this.settings.address).addEventListener(
-			'change',
+			'input',
 			this.onChangeHandler.bind(this)
 		);
 	}
@@ -48,6 +48,7 @@ export class DeliveryFormView extends View<
 			event,
 			value: { address: input.value },
 		});
+		input.focus();
 	}
 
 	set payment(value: PaymentMethod) {
